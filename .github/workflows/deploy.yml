@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Simple CI/CD Pipeline
 
 on:
   push:
@@ -6,30 +6,40 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.10
+      # Step 1: Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Build backend
+      - name: Build Backend
+        run: |
+          cd backend
+          npm install
+          npm test
+
+      # Step 3: Build frontend
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm install
+          npm test
+          npm run build
+
+      # Step 4: Build Docker images
+      - name: Build Docker
+        run: |
+          docker-compose -f docker-compose.yml build
+
+      # Step 5: Deploy to server via SSH
+      - name: Deploy
+        uses: appleboy/ssh-action@v0.1.8
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.DEPLOY_HOST }}
           username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: 
-            # If project folder doesn't exist, clone it
-            if [ ! -d "app" ]; then
-              git clone ${{ secrets.REPO_URL }} app
-            fi
-
-            cd app
-
-            # Pull latest code
-            git fetch --all
-            git reset --hard origin/main
-
-            # Stop running containers
-            docker-compose down
-
-            # Rebuild and start containers
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd /path/to/app
             docker-compose up -d --build
