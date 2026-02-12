@@ -1,0 +1,35 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # If project folder doesn't exist, clone it
+            if [ ! -d "app" ]; then
+              git clone ${{ secrets.REPO_URL }} app
+            fi
+
+            cd app
+
+            # Pull latest code
+            git fetch --all
+            git reset --hard origin/main
+
+            # Stop running containers
+            docker-compose down
+
+            # Rebuild and start containers
+            docker-compose up -d --build
