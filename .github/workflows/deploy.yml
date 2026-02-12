@@ -13,25 +13,32 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Build frontend
+      # Step 2: Build backend
+      - name: Build Backend
+        run: |
+          cd backend
+          npm install
+          # npm test  <-- removed because no test script
+
+      # Step 3: Build frontend
       - name: Build Frontend
         run: |
           cd frontend
           npm install
-          npm test
+          # npm test  <-- removed because no test script
           npm run build
 
-      # Step 3: Build Docker images
+      # Step 4: Build Docker images
       - name: Build Docker
         run: |
           docker-compose -f docker-compose.yml build
 
-      # Step 4: Deploy to server via SSH
+      # Step 5: Deploy to server via SSH
       - name: Deploy
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.DEPLOY_HOST }}
-          username: ubuntu
+          username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             cd /path/to/app
