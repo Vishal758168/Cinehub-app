@@ -16,7 +16,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
+          script: 
             # If project folder doesn't exist, clone it
             if [ ! -d "app" ]; then
               git clone ${{ secrets.REPO_URL }} app
