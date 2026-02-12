@@ -13,14 +13,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Build backend
-      - name: Build Backend
-        run: |
-          cd backend
-          npm install
-          npm test
-
-      # Step 3: Build frontend
+      # Step 2: Build frontend
       - name: Build Frontend
         run: |
           cd frontend
@@ -28,12 +21,12 @@ jobs:
           npm test
           npm run build
 
-      # Step 4: Build Docker images
+      # Step 3: Build Docker images
       - name: Build Docker
         run: |
           docker-compose -f docker-compose.yml build
 
-      # Step 5: Deploy to server via SSH
+      # Step 4: Deploy to server via SSH
       - name: Deploy
         uses: appleboy/ssh-action@v0.1.8
         with:
