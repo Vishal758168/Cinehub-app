@@ -26,7 +26,6 @@ jobs:
           cd frontend
           npm install
           # npm test  <-- removed because no test script
-          npm run build
 
       # Step 4: Build Docker images
       - name: Build Docker
